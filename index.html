@@ -1,48 +1,270 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <title>Website Pertama</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #1e1e2f;
-            color: white;
-            text-align: center;
-            padding-top: 100px;
-        }
+<meta charset="UTF-8">
+<title>Pengelola akun Google</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #f5f5f4;
+    color: #1c1c1a;
+    padding: 24px;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; }
+  h1 { font-size: 20px; font-weight: 500; margin: 0 0 4px; }
+  .sub { font-size: 13px; color: #6f6e6a; margin: 0 0 20px; }
 
-        h1 {
-            color: #00ffcc;
-            font-size: 40px;
-        }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+  .stat { background: #fff; border: 0.5px solid #e2e0d8; border-radius: 10px; padding: 12px 14px; }
+  .stat .n { font-size: 20px; font-weight: 500; }
+  .stat .l { font-size: 12px; color: #6f6e6a; }
+  .stat.live .n { color: #3b6d11; }
+  .stat.dead .n { color: #a32d2d; }
+  .stat.unknown .n { color: #854f0b; }
 
-        button {
-            padding: 12px 25px;
-            font-size: 16px;
-            border: none;
-            border-radius: 8px;
-            background-color: #00ffcc;
-            cursor: pointer;
-        }
+  .add-row {
+    display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;
+  }
+  input[type=text], input[type=email] {
+    flex: 1; min-width: 180px; height: 36px; padding: 0 10px;
+    border: 0.5px solid #d3d1c7; border-radius: 8px; font-size: 14px; background: #fff;
+  }
+  input:focus { outline: none; box-shadow: 0 0 0 2px #cecbf6; }
+  button {
+    height: 36px; padding: 0 14px; border-radius: 8px; border: 0.5px solid #d3d1c7;
+    background: #fff; font-size: 13px; cursor: pointer; color: #1c1c1a;
+  }
+  button:hover { background: #f1efe8; }
+  button:active { transform: scale(0.98); }
+  button.primary { background: #26215c; color: #fff; border-color: #26215c; }
+  button.primary:hover { background: #3c3489; }
 
-        button:hover {
-            background-color: #00ccaa;
-        }
-    </style>
+  textarea {
+    width: 100%; min-height: 70px; padding: 10px; border: 0.5px solid #d3d1c7;
+    border-radius: 8px; font-size: 13px; font-family: inherit; resize: vertical; background: #fff;
+  }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; background: #fff; border-radius: 10px; overflow: hidden; border: 0.5px solid #e2e0d8; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 0.5px solid #e2e0d8; }
+  th { font-weight: 500; color: #6f6e6a; font-size: 12px; background: #faf9f5; }
+  tr:last-child td { border-bottom: none; }
+  .email { font-family: monospace; font-size: 13px; }
+  .note-input { width: 100%; border: none; background: transparent; font-size: 13px; padding: 4px; }
+  .note-input:focus { outline: 1px solid #cecbf6; border-radius: 4px; }
+
+  .badge { display: inline-block; padding: 3px 9px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; border: none; }
+  .badge.live { background: #eaf3de; color: #27500a; }
+  .badge.dead { background: #fcebeb; color: #501313; }
+  .badge.unknown { background: #faeeda; color: #633806; }
+
+  .empty { text-align: center; padding: 40px 20px; color: #6f6e6a; font-size: 13px; }
+  .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px; }
+  .filters { display: flex; gap: 6px; }
+  .filters button.active { background: #1c1c1a; color: #fff; border-color: #1c1c1a; }
+  .del { color: #a32d2d; background: none; border: none; cursor: pointer; font-size: 16px; padding: 4px 8px; }
+  .del:hover { background: #fcebeb; border-radius: 6px; }
+  .footnote { font-size: 12px; color: #6f6e6a; margin-top: 16px; line-height: 1.6; }
+  .import-toggle { font-size: 13px; color: #185fa5; cursor: pointer; margin-bottom: 8px; display: inline-block; }
+</style>
 </head>
 <body>
+<div class="wrap">
+  <h1>Pengelola akun Google</h1>
+  <p class="sub">Simpan daftar akun kamu dan catat status login terakhir. Semua data tersimpan hanya untukmu.</p>
 
-    <h1>HASBI VERY COOL 😎</h1>
-    <p>Ini adalah website sederhana berbasis web</p>
+  <div class="stats">
+    <div class="stat"><div class="n" id="stat-total">0</div><div class="l">Total akun</div></div>
+    <div class="stat live"><div class="n" id="stat-live">0</div><div class="l">Live</div></div>
+    <div class="stat dead"><div class="n" id="stat-dead">0</div><div class="l">Mati</div></div>
+    <div class="stat unknown"><div class="n" id="stat-unknown">0</div><div class="l">Belum dicek</div></div>
+  </div>
 
-    <button onclick="tampilPesan()">Klik Saya</button>
+  <div class="add-row">
+    <input type="email" id="new-email" placeholder="nama@gmail.com">
+    <input type="text" id="new-note" placeholder="Catatan (opsional)">
+    <button class="primary" id="add-btn"><i class="ti ti-plus" aria-hidden="true"></i> Tambah</button>
+  </div>
 
-    <script>
-        function tampilPesan() {
-            alert("Halo! Hasbi memang sangat keren 🔥");
-        }
-    </script>
+  <span class="import-toggle" id="import-toggle">Tambah banyak sekaligus</span>
+  <div id="import-box" style="display:none; margin-bottom:16px;">
+    <textarea id="import-area" placeholder="Satu email per baris&#10;akun1@gmail.com&#10;akun2@gmail.com"></textarea>
+    <div style="margin-top:8px;">
+      <button class="primary" id="import-btn">Impor daftar</button>
+    </div>
+  </div>
 
+  <div class="toolbar">
+    <div class="filters" id="filters">
+      <button class="active" data-f="all">Semua</button>
+      <button data-f="live">Live</button>
+      <button data-f="dead">Mati</button>
+      <button data-f="unknown">Belum dicek</button>
+    </div>
+    <button id="export-btn">Salin daftar live</button>
+  </div>
+
+  <div id="table-holder"></div>
+
+  <p class="footnote">
+    Cara pakai: tambahkan akun, lalu coba login satu per satu secara manual di gmail.com pakai password masing-masing.
+    Kalau berhasil login, tandai "Live". Kalau ditolak/di-suspend, tandai "Mati". Klik badge status untuk mengubahnya.
+  </p>
+</div>
+
+<script>
+let accounts = [];
+let filter = 'all';
+const STORE_KEY = 'gmail-accounts-list';
+
+function load() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    accounts = raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    accounts = [];
+  }
+  render();
+}
+
+function save() {
+  try {
+    localStorage.setItem(STORE_KEY, JSON.stringify(accounts));
+  } catch (e) {
+    console.error('Gagal menyimpan', e);
+  }
+}
+
+function addAccount(email, note) {
+  email = email.trim().toLowerCase();
+  if (!email) return;
+  if (accounts.some(a => a.email === email)) return;
+  accounts.push({ id: Date.now() + Math.random(), email, note: note || '', status: 'unknown' });
+  save();
+  render();
+}
+
+function removeAccount(id) {
+  accounts = accounts.filter(a => a.id !== id);
+  save();
+  render();
+}
+
+function cycleStatus(id) {
+  const order = ['unknown', 'live', 'dead'];
+  const acc = accounts.find(a => a.id === id);
+  if (!acc) return;
+  const idx = order.indexOf(acc.status);
+  acc.status = order[(idx + 1) % order.length];
+  save();
+  render();
+}
+
+function updateNote(id, note) {
+  const acc = accounts.find(a => a.id === id);
+  if (!acc) return;
+  acc.note = note;
+  save();
+}
+
+function render() {
+  const total = accounts.length;
+  const live = accounts.filter(a => a.status === 'live').length;
+  const dead = accounts.filter(a => a.status === 'dead').length;
+  const unknown = accounts.filter(a => a.status === 'unknown').length;
+
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-live').textContent = live;
+  document.getElementById('stat-dead').textContent = dead;
+  document.getElementById('stat-unknown').textContent = unknown;
+
+  const holder = document.getElementById('table-holder');
+  const list = accounts.filter(a => filter === 'all' || a.status === filter);
+
+  if (list.length === 0) {
+    holder.innerHTML = '<div class="empty">Belum ada akun. Tambahkan akun di atas untuk mulai melacak statusnya.</div>';
+    return;
+  }
+
+  let rows = list.map(a => {
+    const label = a.status === 'live' ? 'Live' : a.status === 'dead' ? 'Mati' : 'Belum dicek';
+    return `<tr>
+      <td class="email">${escapeHtml(a.email)}</td>
+      <td><button class="badge ${a.status}" data-id="${a.id}" data-action="cycle">${label}</button></td>
+      <td><input class="note-input" data-id="${a.id}" data-action="note" value="${escapeHtml(a.note)}" placeholder="Catatan"></td>
+      <td><button class="del" data-id="${a.id}" data-action="del" aria-label="Hapus akun"><i class="ti ti-trash" aria-hidden="true"></i></button></td>
+    </tr>`;
+  }).join('');
+
+  holder.innerHTML = `<table>
+    <thead><tr><th>Email</th><th>Status</th><th>Catatan</th><th></th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+
+  holder.querySelectorAll('[data-action="cycle"]').forEach(btn => {
+    btn.addEventListener('click', () => cycleStatus(parseFloat(btn.dataset.id)));
+  });
+  holder.querySelectorAll('[data-action="del"]').forEach(btn => {
+    btn.addEventListener('click', () => removeAccount(parseFloat(btn.dataset.id)));
+  });
+  holder.querySelectorAll('[data-action="note"]').forEach(inp => {
+    inp.addEventListener('change', () => updateNote(parseFloat(inp.dataset.id), inp.value));
+  });
+}
+
+function escapeHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+document.getElementById('add-btn').addEventListener('click', () => {
+  const email = document.getElementById('new-email').value;
+  const note = document.getElementById('new-note').value;
+  addAccount(email, note);
+  document.getElementById('new-email').value = '';
+  document.getElementById('new-note').value = '';
+});
+
+document.getElementById('new-email').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('add-btn').click();
+});
+
+document.getElementById('import-toggle').addEventListener('click', () => {
+  const box = document.getElementById('import-box');
+  box.style.display = box.style.display === 'none' ? 'block' : 'none';
+});
+
+document.getElementById('import-btn').addEventListener('click', () => {
+  const lines = document.getElementById('import-area').value.split('\n');
+  lines.forEach(line => {
+    const email = line.trim();
+    if (email) addAccount(email, '');
+  });
+  document.getElementById('import-area').value = '';
+});
+
+document.getElementById('filters').addEventListener('click', e => {
+  const btn = e.target.closest('button');
+  if (!btn) return;
+  filter = btn.dataset.f;
+  document.querySelectorAll('#filters button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+});
+
+document.getElementById('export-btn').addEventListener('click', () => {
+  const liveList = accounts.filter(a => a.status === 'live').map(a => a.email).join('\n');
+  navigator.clipboard.writeText(liveList || '').then(() => {
+    const btn = document.getElementById('export-btn');
+    const old = btn.textContent;
+    btn.textContent = 'Tersalin';
+    setTimeout(() => { btn.textContent = old; }, 1500);
+  });
+});
+
+load();
+</script>
 </body>
 </html>
